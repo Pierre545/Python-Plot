@@ -1,0 +1,89 @@
+import numpy as np
+import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+
+
+#%%
+def normalization(x) :
+    return (x - x.min()) / (x.max() - x)
+
+
+#%%
+#Importing Dataset
+data        = pd.read_csv("/home/paudisio/Documents/ENS/Réunion/02_04_2024/Fichier excel/Lhasa_Comparaison_GEE_Python (copy).csv")
+data.keys()
+
+
+#%%
+
+y = data["Time"]
+
+x = data["GEE_MNDWI _Perimeter"]
+x_2 = data["ChambollePock_MNDWI _Perimeter"]
+x_3 = data["ChambollePock_NDWI _Perimeter"]
+x_4 = data["Otsu Thresholding MNDWI Perimeter"]
+
+w = data["GEE_MNDWI _Area"]
+w_2 = data["ChambollePock_MNDWI _Area"]
+w_3 = data["ChambollePock_NDWI _Area"]
+w_4 = data["Otsu Thresholding MNDWI Area"]
+
+w = normalization(w)
+w_2 = normalization(w_2)
+w_3 = normalization(w_3)
+w_4 = normalization(w_4)
+
+x = normalization(x)
+x_2 = normalization(x_2)
+x_3 = normalization(x_3)
+x_4 = normalization(x_4)
+
+DGO_1 = 15
+DGO_2 = [16, 29]
+DGO_3 = [29, 42]
+DGO_4 = [42, 58]
+DGO_5 = [58, 74]
+
+y_bis   = y[DGO_4[0]:DGO_4[1]]
+x_bis   = x[DGO_4[0]:DGO_4[1]]
+x2_bis  = x_2[DGO_4[0]:DGO_4[1]]
+x3_bis  = x_3[DGO_4[0]:DGO_4[1]]
+x4_bis  = x_4[DGO_4[0]:DGO_4[1]]
+
+w_bis   = w[DGO_4[0]:DGO_4[1]]
+w2_bis  = w_2[DGO_4[0]:DGO_4[1]]
+w3_bis  = w_3[DGO_4[0]:DGO_4[1]]
+w4_bis  = w_4[DGO_4[0]:DGO_4[1]]
+
+fig, ax1 = plt.subplots()
+ax1.set_title("Lhasa - DGO 54 ")
+
+color = 'red'
+ax1.set_xlabel('Day')
+ax1.set_ylabel('Perimeter (line)', color=color)
+ax1.plot(y_bis, x_bis, color='blue', marker="o")
+ax1.plot(y_bis, x2_bis, color='green',marker="o")
+ax1.plot(y_bis ,x3_bis, color='yellow',marker="o")
+ax1.plot(y_bis ,x4_bis, color='grey',marker="o")
+ax1.set_ylim(-0.3,3)
+ax1.tick_params(axis='x', labelrotation=75)
+ax1.grid()
+
+ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+color = 'blue'
+ax2.set_ylabel('Area (bar)', color=color)  # we already handled the x-label with ax1
+ax2.bar(y_bis ,w3_bis, color='green',alpha=1, label='CP NDWI')
+ax2.bar(y_bis ,w2_bis, color='yellow', label='CP MNDWI')
+ax2.bar(y_bis ,w_bis, color='blue',alpha=1,label='GEE MNDWI')
+ax2.bar(y_bis ,w4_bis, color='grey',alpha=1, label='Otsu MNDWI')
+ax2.legend(loc='upper left', fontsize='x-small')
+ax2.set_ylim(-10,5)
+# ax2.grid()
+
+fig.tight_layout()  # otherwise the right y-label is slightly clipped
+plt.savefig('/home/paudisio/Documents/ENS/Réunion/02_04_2024/Images/DGO_44.png')
+plt.show()
+
